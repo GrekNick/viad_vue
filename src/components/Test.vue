@@ -1,29 +1,27 @@
 <template>
-  	<div id="todo-block">
-			<section class="panel">	
-				<input type="checkbox" id="mark-all" @click="selectAll" :checked="areAllSelected">
-				<input v-model="newTask" @keyup.enter="addTask" placeholder="What do you need to do?" autofocus class="text-input">
-				<button @click="addTask">Add to List</button>
-				<button @click="clearList">Clear List</button>
-			</section>
-			<section class="list">
-
-				<ul class="list-item">
-          <li v-for="task in tasks" v-bind:key="task.id" :class="{done: isChecked(task)}">
-
+  <div id="todo-block">
+    <section class="panel">	
+      <input type="checkbox" id="mark-all" @click="selectAll" :checked="areAllSelected">
+      <input v-model="newTask" placeholder="What do you need to do?" autofocus class="text-input">
+      <button @click="addTask">Add to List</button>
+      <button @click="clearList">Clear List</button>
+    </section>
+    <section class="list">
+      <ul class="list-item">
+        <li v-for="task in tasks" v-bind:key="task.id" :class="{done: isChecked(task)}">
           <input type="checkbox" class="checkbox" @click="check" v-model="task.checked">
-          <!-- <input type="text" 
-                class="text-input"
-                v-if="task === editingTask" 
-                @keyup.enter="endEditing(task)" 
-                @blur="endEditing(task)" v-model="task.text"> -->
-          <label for="checkbox" v-if="task !== editingTask" @dblclick="editTask(task)">{{ task.text }}</label>
+					<input type="text" 
+            class="text-input" 
+            v-if="task === editingTask" 
+            @keyup.enter="endEditing(task)"
+            v-model="task.text">
+					<label for="checkbox" v-if="task !== editingTask">{{ task.text }}</label>
+          <button @click="editTask(task);endEditing(task)">Edit</button>
           <button class="delete" @click="removeTask(task)">X</button>
-
-					</li>
-				</ul>
-			</section>
-  	</div>
+        </li>
+      </ul>
+    </section>
+  </div>
 </template>
 
 <script>
@@ -34,6 +32,7 @@ export default ({
   data () {
     return {
     newTask: "",
+    visible: false,
     tasks: [
       {
         text: "This is an example task.",
@@ -68,6 +67,18 @@ export default ({
       this.tasks.splice(index, 1);
     },
 
+    addTask: function () {
+      var task = this.newTask.trim();
+      if (task) {
+        this.tasks.push({text: task, checked: false});
+        this.newTask = "";
+      }
+    },
+
+    removeTask: function (task) {
+      var index = this.tasks.indexOf(task);
+      this.tasks.splice(index, 1);
+    },
     editTask: function (task) {
       this.editingTask = task;
     },
@@ -86,7 +97,7 @@ export default ({
       ];
     },
 
-    selectAll: function (task) {
+    selectAll: function () {
       var targetValue = this.areAllSelected ? false : true;
       for (var i = 0; i < this.tasks.length; i++) {
         this.tasks[i].checked = targetValue;
@@ -130,6 +141,7 @@ body {
 	align-items: center;
 	justify-content: space-between;
 	list-style-type: none;
+  position: relative;
 	padding: 10px;
 	border-bottom: 1px solid #efefef;
 	background-color: #E7E8EB;
@@ -155,7 +167,15 @@ button {
 	font-size: 14px;
 }
 
-
+.edit_inp{
+  height: 30px;
+  padding-left: 10px;
+  position: absolute;
+  left: 140px;
+  top: 10px;
+  width: 250px;
+  z-index: 20;
+}
 
 .list li {
 	background-color: #3465A4;
@@ -163,16 +183,12 @@ button {
 
 .list li button {
 	background-color: transparent;
-	border: 1px solid #3465A4;
+	/* border: 1px solid #3465A4; */
 	color: #ddd;
-	visibility: hidden;
 	font-size: 20px;
 	font-weight: bold;
 }
 
-.list li:hover > button {
-	visibility: visible;
-}
 
 .list label {
 	padding-right: 10px;
@@ -188,6 +204,9 @@ button {
 .list li.done label {
 	color: #d9d9d9;
 	text-decoration: line-through;
+}
+.list li.done{
+  background-color: lightcoral;
 }
 
 
